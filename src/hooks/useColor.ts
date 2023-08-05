@@ -46,7 +46,7 @@ async function getColorFromUriPath(uri: string): Promise<string | null> {
 }
 
 export function useColor(address?: string) {
-  const [color, setColor] = useState('#2172E5')
+  const [color, setColor] = useState('#6f4b23')
 
   const formattedAddress = isAddress(address)
 
@@ -67,7 +67,7 @@ export function useColor(address?: string) {
 
     return () => {
       stale = true
-      setColor('#2172E5')
+      setColor('#6f4b23')
     }
   }, [token])
 

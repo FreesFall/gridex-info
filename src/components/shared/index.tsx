@@ -23,7 +23,7 @@ export const Arrow = styled.div<{ faded: boolean }>`
 
 export const Break = styled.div`
   height: 1px;
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: rgba(43, 43, 43, 0.435);
   width: 100%;
 `
 

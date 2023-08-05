@@ -97,7 +97,7 @@ export default function Menu() {
 
       {open && (
         <MenuFlyout>
-          <MenuItem id="link" href="https://uniswap.org/">
+          <MenuItem id="link" href="https://benswap.cash/">
             <Info size={14} />
             About
           </MenuItem>
