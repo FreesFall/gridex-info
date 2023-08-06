@@ -89,6 +89,8 @@ export function colors(darkMode: boolean): Colors {
     yellow5: '#f98c08',
     yellow6: '#6f4b23',
     yellow7: '#d9b68b21',
+    yellow8: '#4f4840',
+    yellow9: '#85786b',
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
     // blue5: darkMode ? '#153d6f70' : '#EBF4FF',
@@ -177,6 +179,9 @@ export const TYPE = {
   },
   gray(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'bg3'} {...props} />
+  },
+  yellow9(props: TextProps) {
+    return <TextWrapper fontWeight={500} color={'yellow9'} {...props} />
   },
   italic(props: TextProps) {
     return <TextWrapper fontWeight={500} fontSize={12} fontStyle={'italic'} color={'text2'} {...props} />

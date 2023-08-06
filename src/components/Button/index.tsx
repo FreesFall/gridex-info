@@ -418,7 +418,7 @@ export const SmallOptionButton = styled(Base)<{ active?: boolean }>`
   font-size: 12px;
   border-radius: 4px;
   min-width: 36px;
-  background-color: ${({ active, theme }) => (active ? theme.bg2 : theme.bg1)};
+  background-color: ${({ active, theme }) => (active ? theme.yellow8 : theme.bg1)};
   color: ${({ active, theme }) => (active ? theme.text1 : theme.text2)};
 
   :hover {

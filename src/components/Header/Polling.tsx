@@ -14,7 +14,7 @@ const StyledPolling = styled.div`
   border-radius: 4px;
   width: 192px;
   padding: 4px;
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: #5f554882;
   transition: opacity 0.25s ease;
   color: ${({ theme }) => theme.green1};
   :hover {

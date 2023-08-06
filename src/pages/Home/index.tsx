@@ -32,6 +32,9 @@ const ChartWrapper = styled.div`
     width: 100%;
   `};
 `
+const CustomStyledInternalLink = styled(StyledInternalLink)`
+  color: ${({ theme }) => theme.yellow5};
+`
 
 export default function Home() {
   useEffect(() => {
@@ -135,7 +138,7 @@ export default function Home() {
               data={formattedTvlData}
               height={220}
               minHeight={332}
-              color={activeNetwork.primaryColor}
+              color={'#de9e4f'}
               value={liquidityHover}
               label={leftLabel}
               setValue={setLiquidityHover}
@@ -164,7 +167,7 @@ export default function Home() {
                   ? weeklyVolumeData
                   : formattedVolumeData
               }
-              color={theme.blue1}
+              color={'#de9e4f'}
               setValue={setVolumeHover}
               setLabel={setRightLabel}
               value={volumeHover}
@@ -236,12 +239,12 @@ export default function Home() {
         </HideSmall>
         <RowBetween>
           <TYPE.main>Top Tokens</TYPE.main>
-          <StyledInternalLink to="tokens">Explore</StyledInternalLink>
+          <CustomStyledInternalLink to="tokens">Explore</CustomStyledInternalLink>
         </RowBetween>
         <TokenTable tokenDatas={formattedTokens} />
         <RowBetween>
           <TYPE.main>Top Pools</TYPE.main>
-          <StyledInternalLink to="pools">Explore</StyledInternalLink>
+          <CustomStyledInternalLink to="pools">Explore</CustomStyledInternalLink>
         </RowBetween>
         <PoolTable poolDatas={poolDatas} />
         <RowBetween>

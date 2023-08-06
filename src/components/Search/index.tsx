@@ -50,10 +50,10 @@ const StyledInput = styled.input`
   width: 100%;
   font-size: 16px;
   outline: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.yellow9};
 
   ::placeholder {
-    color: ${({ theme }) => theme.text3};
+    color: ${({ theme }) => theme.yellow9};
     font-size: 16px;
   }
 
@@ -244,7 +244,7 @@ const Search = ({ ...rest }: React.HTMLAttributes<HTMLDivElement>) => {
             }}
             onBlur={() => setFocused(false)}
           />
-          {!focused && <TYPE.gray pl="2px">⌘/</TYPE.gray>}
+          {!focused && <TYPE.yellow9 pl="2px">⌘/</TYPE.yellow9>}
         </Wrapper>
         <Menu hide={!showMenu} ref={menuRef}>
           <AutoColumn gap="lg">

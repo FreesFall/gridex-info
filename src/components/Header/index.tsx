@@ -106,7 +106,7 @@ const StyledNavLink = styled(NavLink).attrs({
 
   &.${activeClassName} {
     border-radius: 12px;
-    background-color: ${({ theme }) => theme.bg2};
+    background-color: ${({ theme }) => theme.yellow7};
     color: ${({ theme }) => theme.text1};
   }
 
