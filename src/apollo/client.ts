@@ -22,6 +22,7 @@ export const blockClient = new ApolloClient({
 
 export const client = new ApolloClient({
   uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  // uri: 'http://173.208.142.67:8000/subgraphs/name/bentokenfinance/bch-gridexinfo/graphql?',
   cache: new InMemoryCache({
     typePolicies: {
       Token: {
