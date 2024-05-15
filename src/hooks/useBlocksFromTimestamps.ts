@@ -61,7 +61,7 @@ export function useBlocksFromTimestamps(
   const blocksFormatted = useMemo(() => {
     if (blocks?.[activeNetwork.id]) {
       const networkBlocks = blocks?.[activeNetwork.id]
-      const formatted = []
+      const formatted:any = []
       for (const t in networkBlocks) {
         if (networkBlocks[t].length > 0) {
           const number = networkBlocks[t][0]['number']

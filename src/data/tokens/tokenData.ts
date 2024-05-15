@@ -1,3 +1,4 @@
+import { Token } from '@uniswap/sdk-core';
 import { getPercentChange } from './../../utils/data'
 import { useQuery } from '@apollo/client'
 import gql from 'graphql-tag'
@@ -8,7 +9,41 @@ import { TokenData } from 'state/tokens/reducer'
 import { useEthPrices } from 'hooks/useEthPrices'
 import { formatTokenSymbol, formatTokenName } from 'utils/tokens'
 import { useActiveNetworkVersion, useClients } from 'state/application/hooks'
-
+import { useEffect, useState } from 'react'
+// TO DO
+// txCount
+// totalValueLockedUSD
+// feesUSD
+// totalValueLocked
+// txCount
+// export const TOKENS_BULK = (block: number | undefined, tokens: string[]) => {
+//   let tokenString = `[`
+//   tokens.map((address) => {
+//     return (tokenString += `"${address}",`)
+//   })
+//   tokenString += ']'
+//   const queryString =
+//     `
+//     query tokens {
+//       tokens(where: {id_in: ${tokenString}},` +
+//     (block ? `block: {number: ${block}} ,` : ``) +
+//     ` orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+//       id
+//       symbol
+//       name
+//       derivedETH
+//       volumeUSD
+//       volume
+//       txCount
+//       totalValueLockedUSD
+//       feesUSD
+//       totalValueLocked
+//       txCount
+//       }
+//     }
+//     `
+//   return gql(queryString)
+// }
 export const TOKENS_BULK = (block: number | undefined, tokens: string[]) => {
   let tokenString = `[`
   tokens.map((address) => {
@@ -18,25 +53,21 @@ export const TOKENS_BULK = (block: number | undefined, tokens: string[]) => {
   const queryString =
     `
     query tokens {
-      tokens(where: {id_in: ${tokenString}},` +
-    (block ? `block: {number: ${block}} ,` : ``) +
-    ` orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
-        id
-        symbol
-        name
-        derivedETH
-        volumeUSD
-        volume
-        txCount
-        totalValueLocked
-        feesUSD
-        totalValueLockedUSD
+      tokens(` +
+    (block ? `block: {number: ${15162890}} ,` : ``) +
+    ` orderBy: id, orderDirection: desc, subgraphError: allow) {
+      id
+      symbol
+      name
+      derivedBCH
+      tradeVolumeUSD
+      tradeVolume
+      totalTransactions
       }
     }
     `
   return gql(queryString)
 }
-
 interface TokenFields {
   id: string
   symbol: string
@@ -84,6 +115,30 @@ export function useFetchedTokenDatas(
   const { loading, error, data } = useQuery<TokenDataResponse>(TOKENS_BULK(undefined, tokenAddresses), {
     client: dataClient,
   })
+  // 定义一个状态来存储从GraphQL查询获取的数据
+  // const [data, setTokenData] = useState<TokenDataResponse|undefined>()
+  // // 当 data 发生变化时更新状态
+  // useEffect(() => {
+  //   if(data_1){
+  //     data_1.tokens= data_1.tokens.map((t:any)=>(
+  //       {
+  //         id: t.id,
+  //         symbol: t.symbol,
+  //         name: t.name,
+  //         derivedETH: t.derivedBCH,
+  //         volumeUSD: t.tradeVolumeUSD,
+  //         volume: t.tradeVolume,
+  //         feesUSD: '',
+  //         txCount: '',
+  //         totalValueLocked: '',
+  //         totalValueLockedUSD: ''
+  //       }
+
+  //     ))
+  //   }
+  //   console.log(data_1)
+  //   setTokenData(data_1);
+  // }, [data_1]);
 
   const { loading: loading24, error: error24, data: data24 } = useQuery<TokenDataResponse>(
     TOKENS_BULK(parseInt(block24?.number), tokenAddresses),

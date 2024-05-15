@@ -84,7 +84,7 @@ export async function fetchTokenPriceData(
     }
 
     // create an array of hour start times until we reach current hour
-    const timestamps = []
+    const timestamps:any = []
     let time = startTimestamp
     while (time <= endTimestamp) {
       timestamps.push(time)
