@@ -5,13 +5,22 @@ import { useActiveNetworkVersion, useClients } from 'state/application/hooks'
 import { notEmpty } from 'utils'
 import { POOL_HIDE } from '../../constants'
 
+// export const TOP_POOLS = gql`
+//   query topPools {
+//     pools(first: 50, orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+//       id
+//     }
+//   }
+// `
+//TO DO orderBy: untrackedVolumeUSD => orderBy: totalValueLockedUSD
 export const TOP_POOLS = gql`
-  query topPools {
-    pools(first: 50, orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+  query Pair {
+    pairs(first: 50, orderBy: untrackedVolumeUSD, orderDirection: desc, subgraphError: allow) {
       id
     }
   }
 `
+
 
 interface TopPoolsResponse {
   pools: {
@@ -29,11 +38,18 @@ export function useTopPoolAddresses(): {
 } {
   const [currentNetwork] = useActiveNetworkVersion()
   const { dataClient } = useClients()
-  const { loading, error, data } = useQuery<TopPoolsResponse>(TOP_POOLS, {
+  const { loading, error, data:data_1 } = useQuery<TopPoolsResponse>(TOP_POOLS, {
     client: dataClient,
     fetchPolicy: 'cache-first',
   })
-
+  const data:any=useMemo(()=>{
+    if(data_1){
+      return {pools:((data_1 as any).pairs).map(t=>{
+        return t;
+      })}
+    }
+    return data_1;
+  },[data_1])
   const formattedData = useMemo(() => {
     if (data) {
       return data.pools

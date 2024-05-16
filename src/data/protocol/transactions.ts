@@ -3,62 +3,123 @@ import gql from 'graphql-tag'
 import { Transaction, TransactionType } from 'types'
 import { formatTokenSymbol } from 'utils/tokens'
 
+// const GLOBAL_TRANSACTIONS = gql`
+//   query transactions {
+//     transactions(first: 500, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {
+//       id
+//       timestamp
+//       mints {
+//         pool {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         owner
+//         sender
+//         origin
+//         amount0
+//         amount1
+//         amountUSD
+//       }
+//       swaps {
+//         pool {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         origin
+//         amount0
+//         amount1
+//         amountUSD
+//       }
+//       burns {
+//         pool {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         owner
+//         origin
+//         amount0
+//         amount1
+//         amountUSD
+//       }
+//     }
+//   }
+// `
+
+// transactions缺少
+// mints {
+//   pool {
+//     token0 {
+//       id
+//       symbol
+//     }
+//     token1 {
+//       id
+//       symbol
+//     }
+//   }
+//   owner
+//   sender
+//   origin
+//   amount0
+//   amount1
+//   amountUSD
+// }
+// swaps {
+//   pool {
+//     token0 {
+//       id
+//       symbol
+//     }
+//     token1 {
+//       id
+//       symbol
+//     }
+//   }
+//   origin
+//   amount0
+//   amount1
+//   amountUSD
+// }
+// burns {
+//   pool {
+//     token0 {
+//       id
+//       symbol
+//     }
+//     token1 {
+//       id
+//       symbol
+//     }
+//   }
+//   owner
+//   origin
+//   amount0
+//   amount1
+//   amountUSD
+// }
 const GLOBAL_TRANSACTIONS = gql`
   query transactions {
     transactions(first: 500, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {
       id
       timestamp
-      mints {
-        pool {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        owner
-        sender
-        origin
-        amount0
-        amount1
-        amountUSD
-      }
-      swaps {
-        pool {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        origin
-        amount0
-        amount1
-        amountUSD
-      }
-      burns {
-        pool {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        owner
-        origin
-        amount0
-        amount1
-        amountUSD
-      }
     }
   }
 `
@@ -125,10 +186,77 @@ export async function fetchTopTransactions(
   client: ApolloClient<NormalizedCacheObject>
 ): Promise<Transaction[] | undefined> {
   try {
-    const { data, error, loading } = await client.query<TransactionResults>({
+    const { data:data_1, error, loading } = await client.query<TransactionResults>({
       query: GLOBAL_TRANSACTIONS,
       fetchPolicy: 'cache-first',
     })
+
+  
+    const getData=(data_1)=>{
+      try {
+        const transactions=data_1.transactions.map(t=>{
+          const ret:TransactionEntry={
+            timestamp: t.timestamp,
+            id: t.id,
+            mints:[ {
+              pool: {
+                token0: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                },
+                token1: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                }
+              },
+              origin: '0x0000000000000000000000000000000000000000',
+              amount0: '11',
+              amount1: '11',
+              amountUSD: '11'
+            }],
+            swaps:[ {
+              pool: {
+                token0: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                },
+                token1: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                }
+              },
+              origin: '0x0000000000000000000000000000000000000000',
+              amount0: '11',
+              amount1: '11',
+              amountUSD: '11'
+            }],
+            burns:[ {
+              pool: {
+                token0: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                },
+                token1: {
+                  id: '0x0000000000000000000000000000000000000000',
+                  symbol: 'ETH'
+                }
+              },
+              owner: '0x0000000000000000000000000000000000000000',
+              origin: '0x0000000000000000000000000000000000000000',
+              amount0: '11',
+              amount1: '11',
+              amountUSD: '11'
+            }]
+          };
+          return ret;
+        })
+        return {transactions:transactions};
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    };
+    const data:any=getData(data_1);
 
     if (error || loading || !data) {
       return undefined

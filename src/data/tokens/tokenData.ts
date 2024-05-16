@@ -53,7 +53,7 @@ export const TOKENS_BULK = (block: number | undefined, tokens: string[]) => {
   const queryString =
     `
     query tokens {
-      tokens(` +
+      tokens(where: {id_in: ${tokenString}},`+
     (block ? `block: {number: ${15162890}} ,` : ``) +
     ` orderBy: id, orderDirection: desc, subgraphError: allow) {
       id
@@ -110,35 +110,37 @@ export function useFetchedTokenDatas(
 
   const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek])
   const [block24, block48, blockWeek] = blocks ?? []
-  const ethPrices = useEthPrices()
+  const ethPrices = useEthPrices();
 
-  const { loading, error, data } = useQuery<TokenDataResponse>(TOKENS_BULK(undefined, tokenAddresses), {
+
+  //TO DO data: data_1 => data
+  const { loading, error, data:data_1} = useQuery<TokenDataResponse>(TOKENS_BULK(undefined, tokenAddresses), {
     client: dataClient,
   })
   // 定义一个状态来存储从GraphQL查询获取的数据
-  // const [data, setTokenData] = useState<TokenDataResponse|undefined>()
-  // // 当 data 发生变化时更新状态
-  // useEffect(() => {
-  //   if(data_1){
-  //     data_1.tokens= data_1.tokens.map((t:any)=>(
-  //       {
-  //         id: t.id,
-  //         symbol: t.symbol,
-  //         name: t.name,
-  //         derivedETH: t.derivedBCH,
-  //         volumeUSD: t.tradeVolumeUSD,
-  //         volume: t.tradeVolume,
-  //         feesUSD: '',
-  //         txCount: '',
-  //         totalValueLocked: '',
-  //         totalValueLockedUSD: ''
-  //       }
+  const [data, setTokenData] = useState<TokenDataResponse|undefined>()
+  // 当 data 发生变化时更新状态
+  useEffect(() => {
+    if(data_1){
+      data_1.tokens= data_1.tokens.map((t:any)=>(
+        {
+          id: t.id,
+          symbol: t.symbol,
+          name: t.name,
+          derivedETH: t.derivedBCH,
+          volumeUSD: t.tradeVolumeUSD,
+          volume: t.tradeVolume,
+          feesUSD: '11',
+          txCount: '11',
+          totalValueLocked: '11',
+          totalValueLockedUSD: '11'
+        }
 
-  //     ))
-  //   }
-  //   console.log(data_1)
-  //   setTokenData(data_1);
-  // }, [data_1]);
+      ))
+    }
+    console.log(data_1)
+    setTokenData(data_1);
+  }, [data_1]);
 
   const { loading: loading24, error: error24, data: data24 } = useQuery<TokenDataResponse>(
     TOKENS_BULK(parseInt(block24?.number), tokenAddresses),

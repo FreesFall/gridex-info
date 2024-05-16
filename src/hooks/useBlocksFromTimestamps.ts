@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 import { useState, useEffect, useMemo } from 'react'
 import { splitQuery } from 'utils/queries'
 import { START_BLOCKS } from 'constants/index'
-import { useActiveNetworkVersion, useClients } from 'state/application/hooks'
+import { useActiveNetworkVersion, useBlockNumber, useClients } from 'state/application/hooks'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
 export const GET_BLOCKS = (timestamps: string[]) => {
@@ -43,10 +43,72 @@ export function useBlocksFromTimestamps(
 
   // derive blocks based on active network
   const networkBlocks = blocks?.[activeNetwork.id]
-
+  // const blockNumber= useBlockNumber();
   useEffect(() => {
+    // 计算给定日期的8点对应的区块号
+    const calculateBlockNumberFor8AM=(daysAgo:any, currentBlockNumber:any, currentDate:any)=>{
+      const millisecondsPerBlock = 6000;
+      const now = currentDate; // 获取当前时间
+      const todayAt8AM = new Date(now.getFullYear(), now.getMonth(), now.getDate()-daysAgo, 8, 0, 0); // 设置为今天的8点
+      const timeDifference = currentDate.getTime() -  todayAt8AM.getTime(); // 时间差（毫秒）
+      const blocksAgo = timeDifference / millisecondsPerBlock;
+      return {date:todayAt8AM.getTime(),block:Math.floor(currentBlockNumber - blocksAgo)};
+    }
+    // 计算包括今天在内的前10天每天8点的区块号
+    const calculateBlockNumbersForLast10Days8AM=(timestamps:any[],currentBlockNumber:any)=>{
+      const currentDate = new Date(); // 当前日期和时间
+      const blockNumbers :any= [];
+
+      // for (let daysAgo = 0; daysAgo <= 10; daysAgo++) {
+      //   const blockNumberForDay = calculateBlockNumberFor8AM(daysAgo, currentBlockNumber, currentDate);
+      //   blockNumbers.push(blockNumberForDay);
+      // }
+
+      const currentTimestamp = Math.floor(Date.now() / 1000); // 获取当前时间戳（秒）
+      const timestamp = timestamps; // 三个时间戳
+      const res=timestamps.map((t,index)=>{
+        const diffSeconds = currentTimestamp - t;
+        const diffDays = diffSeconds / (60 * 60 * 24); // 将秒转换为天
+        console.log(`${index}: ${diffDays} days ago`);
+        return Math.floor(diffDays);
+      })
+      console.log("结果",res)
+   
+      for(const p of res){
+        const blockNumberForDay = calculateBlockNumberFor8AM(p, currentBlockNumber, currentDate);
+        blockNumbers.push(blockNumberForDay);
+      }
+      console.log(blockNumbers)
+      return blockNumbers;
+    }
+
+
     async function fetchData() {
-      const results = await splitQuery(GET_BLOCKS, activeBlockClient, [], timestamps)
+      calculateBlockNumbersForLast10Days8AM(timestamps, "55555555")
+      const results:any={
+        "data": {
+            "t1715744820": [
+                {
+                    "number": "19872834",
+                    "__typename": "Block"
+                }
+            ],
+            "t1715658420": [
+                {
+                    "number": "19865711",
+                    "__typename": "Block"
+                }
+            ],
+            "t1715226420": [
+                {
+                    "number": "19829947",
+                    "__typename": "Block"
+                }
+            ]
+        }
+      }
+      // TO DO
+      // const results = await splitQuery(GET_BLOCKS, activeBlockClient, [], timestamps)
       if (results) {
         setBlocks({ ...(blocks ?? {}), [activeNetwork.id]: results })
       } else {

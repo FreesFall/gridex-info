@@ -6,6 +6,70 @@ import { PoolData } from 'state/pools/reducer'
 import { get2DayChange } from 'utils/data'
 import { formatTokenName, formatTokenSymbol } from 'utils/tokens'
 import { useActiveNetworkVersion, useClients } from 'state/application/hooks'
+import { useMemo } from 'react'
+
+// export const POOLS_BULK = (block: number | undefined, pools: string[]) => {
+//   let poolString = `[`
+//   pools.map((address) => {
+//     return (poolString += `"${address}",`)
+//   })
+//   poolString += ']'
+//   const queryString =
+//     `
+//     query pools {
+//       pools(where: {id_in: ${poolString}},` +
+//     (block ? `block: {number: ${block}} ,` : ``) +
+//     ` orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+//         id
+//         feeTier
+//         liquidity
+//         sqrtPrice
+//         tick
+//         token0 {
+//             id
+//             symbol 
+//             name
+//             decimals
+//             derivedETH
+//         }
+//         token1 {
+//             id
+//             symbol 
+//             name
+//             decimals
+//             derivedETH
+//         }
+//         token0Price
+//         token1Price
+//         volumeUSD
+//         volumeToken0
+//         volumeToken1
+//         txCount
+//         totalValueLockedToken0
+//         totalValueLockedToken1
+//         totalValueLockedUSD
+//       }
+//       bundles (where: {id: "1"}) {
+//         ethPriceUSD
+//       }
+//     }
+//     `
+//   return gql(queryString)
+// }
+
+
+//  TO DO
+//  pairs缺少
+//  feeTier
+//  liquidity
+//  sqrtPrice
+//  tick
+//  totalValueLockedToken0
+//  totalValueLockedToken1
+//  totalValueLockedUSD
+//  bundles (where: {id: "1"}) {
+//   ethPriceUSD
+//  }
 
 export const POOLS_BULK = (block: number | undefined, pools: string[]) => {
   let poolString = `[`
@@ -15,47 +79,37 @@ export const POOLS_BULK = (block: number | undefined, pools: string[]) => {
   poolString += ']'
   const queryString =
     `
-    query pools {
-      pools(where: {id_in: ${poolString}},` +
+    query Pair {
+      pairs(where: {},` +
     (block ? `block: {number: ${block}} ,` : ``) +
-    ` orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+    ` orderBy: volumeUSD, orderDirection: desc, subgraphError: allow) {
         id
-        feeTier
-        liquidity
-        sqrtPrice
-        tick
+        totalSupply
         token0 {
             id
             symbol 
             name
             decimals
-            derivedETH
+            derivedBCH
         }
         token1 {
             id
             symbol 
             name
             decimals
-            derivedETH
+            derivedBCH
         }
         token0Price
         token1Price
         volumeUSD
         volumeToken0
         volumeToken1
-        txCount
-        totalValueLockedToken0
-        totalValueLockedToken1
-        totalValueLockedUSD
-      }
-      bundles (where: {id: "1"}) {
-        ethPriceUSD
+        totalTransactions
       }
     }
     `
   return gql(queryString)
 }
-
 interface PoolFields {
   id: string
   feeTier: string
@@ -117,22 +171,56 @@ export function usePoolDatas(
   const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek])
   const [block24, block48, blockWeek] = blocks ?? []
 
-  const { loading, error, data } = useQuery<PoolDataResponse>(POOLS_BULK(undefined, poolAddresses), {
+  const { loading, error, data:data_1 } = useQuery<PoolDataResponse>(POOLS_BULK(undefined, poolAddresses), {
     client: dataClient,
   })
 
-  const { loading: loading24, error: error24, data: data24 } = useQuery<PoolDataResponse>(
+  const getRes=(data)=>{
+    if(data){
+      return {
+        bundles:[{ethPriceUSD: "11", __typename: "Bundle"}],
+        pools:((data as any).pairs).map(t=>{
+        const ret:PoolFields={
+          id: t.id,
+          feeTier: '11',
+          liquidity: '11',
+          sqrtPrice: '11',
+          tick: '11',
+          token0: t.token0,
+          token1: t.token1,
+          token0Price: t.token0Price,
+          token1Price: t.token1Price,
+          volumeUSD: t.volumeUSD,
+          volumeToken0: t.volumeToken0,
+          volumeToken1: t.volumeToken1,
+          txCount: t.totalTransactions,
+          totalValueLockedToken0: '11',
+          totalValueLockedToken1: '11',
+          totalValueLockedUSD: '11'
+        
+        };
+        return ret;
+      })}
+    }
+    return data;
+  }
+
+  const { loading: loading24, error: error24, data: data24_1 } = useQuery<PoolDataResponse>(
     POOLS_BULK(block24?.number, poolAddresses),
     { client: dataClient }
   )
-  const { loading: loading48, error: error48, data: data48 } = useQuery<PoolDataResponse>(
+  const { loading: loading48, error: error48, data: data48_1 } = useQuery<PoolDataResponse>(
     POOLS_BULK(block48?.number, poolAddresses),
     { client: dataClient }
   )
-  const { loading: loadingWeek, error: errorWeek, data: dataWeek } = useQuery<PoolDataResponse>(
+  const { loading: loadingWeek, error: errorWeek, data: dataWeek_1 } = useQuery<PoolDataResponse>(
     POOLS_BULK(blockWeek?.number, poolAddresses),
     { client: dataClient }
   )
+  const data=useMemo(()=>{return getRes(data_1)},[data_1])
+  const data24=useMemo(()=>{return getRes(data24_1)},[data24_1])
+  const data48=useMemo(()=>{return getRes(data24_1)},[data48_1])
+  const dataWeek=useMemo(()=>{return getRes(dataWeek_1)},[dataWeek_1])
 
   const anyError = Boolean(error || error24 || error48 || blockError || errorWeek)
   const anyLoading = Boolean(loading || loading24 || loading48 || loadingWeek)

@@ -31,7 +31,7 @@ export type NetworkInfo = {
 }
 
 export const EthereumNetworkInfo: NetworkInfo = {
-  chainId: ChainId.MAINNET,
+  chainId: 10000 as any,
   id: SupportedNetwork.ETHEREUM,
   route: '',
   name: 'Ethereum',

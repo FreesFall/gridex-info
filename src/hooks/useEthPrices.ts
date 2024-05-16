@@ -112,14 +112,20 @@ export function useEthPrices(): EthPrices | undefined {
 
   useEffect(() => {
     async function fetch() {
-      const { data, error } = await fetchEthPrices(formattedBlocks as [number, number, number], dataClient)
-      if (error || blockError) {
-        setError(true)
-      } else if (data) {
-        setPrices({
-          [activeNetwork.id]: data,
-        })
-      }
+      const error=false;
+      const data:any={current: 3010.1983491274596, oneDay: 2902.5802167778184, twoDay: 2891.526607092081, week: 3002.823719293716}
+      setPrices({
+        [activeNetwork.id]: data,
+      })
+      // TO DO
+      // const { data, error } = await fetchEthPrices(formattedBlocks as [number, number, number], dataClient)
+      // if (error || blockError) {
+      //   setError(true)
+      // } else if (data) {
+      //   setPrices({
+      //     [activeNetwork.id]: data,
+      //   })
+      // }
     }
     if (!indexedPrices && !error && formattedBlocks) {
       fetch()

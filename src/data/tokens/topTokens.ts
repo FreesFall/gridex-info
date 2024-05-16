@@ -2,10 +2,19 @@ import { useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import gql from 'graphql-tag'
 import { useClients } from 'state/application/hooks'
+// TO DO
+// orderBy: totalValueLockedUSD
 
+// export const TOP_TOKENS = gql`
+//   query topPools {
+//     tokens(first: 50, orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+//       id
+//     }
+//   }
+// `
 export const TOP_TOKENS = gql`
   query topPools {
-    tokens(first: 50, orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
+    tokens(first: 50, orderDirection: desc, subgraphError: allow) {
       id
     }
   }
