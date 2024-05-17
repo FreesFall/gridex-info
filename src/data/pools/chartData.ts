@@ -10,26 +10,48 @@ dayjs.extend(utc)
 dayjs.extend(weekOfYear)
 const ONE_DAY_UNIX = 24 * 60 * 60
 
+// const POOL_CHART = gql`
+//   query poolDayDatas($startTime: Int!, $skip: Int!, $address: Bytes!) {
+//     poolDayDatas(
+//       first: 1000
+//       skip: $skip
+//       where: { pool: $address, date_gt: $startTime }
+//       orderBy: date
+//       orderDirection: asc
+//       subgraphError: allow
+//     ) {
+//       date
+//       volumeUSD
+//       tvlUSD
+//       feesUSD
+//       pool {
+//         feeTier
+//       }
+//     }
+//   }
+// `
+
+//PairDayDatas
+// 缺少
+// tvlUSD
+// feesUSD
+// pool {
+//   feeTier
+// }
 const POOL_CHART = gql`
-  query poolDayDatas($startTime: Int!, $skip: Int!, $address: Bytes!) {
-    poolDayDatas(
+  query PairDayDatas {
+    pairDayDatas(
       first: 1000
       skip: $skip
-      where: { pool: $address, date_gt: $startTime }
       orderBy: date
       orderDirection: asc
-      subgraphError: allow
     ) {
       date
-      volumeUSD
-      tvlUSD
-      feesUSD
-      pool {
-        feeTier
-      }
+      dailyVolumeUSD
     }
   }
 `
+
 
 interface ChartResults {
   poolDayDatas: {
@@ -62,15 +84,29 @@ export async function fetchPoolChartData(address: string, client: ApolloClient<N
 
   try {
     while (!allFound) {
-      const { data: chartResData, error, loading } = await client.query<ChartResults>({
+      const { data: chartResData_1, error, loading } = await client.query<ChartResults>({
         query: POOL_CHART,
-        variables: {
-          address: address,
-          startTime: startTimestamp,
-          skip,
-        },
+        // variables: {
+        //   address: address,
+        //   startTime: startTimestamp,
+        //   skip,
+        // },
         fetchPolicy: 'cache-first',
       })
+      const chartResData={
+        poolDayDatas:(chartResData_1 as any).pairDayDatas.map((t:any)=>{
+          return {
+            date: t.date,
+            volumeUSD: t.dailyVolumeUSD,
+            tvlUSD: '11',
+            feesUSD: '11',
+            pool: {
+              feeTier: "11"
+            }
+          }
+        })
+      }
+
       if (!loading) {
         skip += 1000
         if (chartResData.poolDayDatas.length < 1000 || error) {

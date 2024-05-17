@@ -15,9 +15,30 @@ dayjs.extend(utc)
 dayjs.extend(weekOfYear)
 const ONE_DAY_UNIX = 24 * 60 * 60
 
+// const GLOBAL_CHART = gql`
+//   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
+//     uniswapDayDatas(
+//       first: 1000
+//       skip: $skip
+//       subgraphError: allow
+//       where: { date_gt: $startTime }
+//       orderBy: date
+//       orderDirection: asc
+//     ) {
+//       id
+//       date
+//       volumeUSD
+//       tvlUSD
+//     }
+//   }
+// `
+
+// BenSwapDayData 
+// 缺少
+// tvlUSD
 const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(
+  query BenSwapDayDatas ($startTime: Int!, $skip: Int!) {
+    BenSwapDayDatas(
       first: 1000
       skip: $skip
       subgraphError: allow
@@ -27,11 +48,12 @@ const GLOBAL_CHART = gql`
     ) {
       id
       date
-      volumeUSD
+      dailyVolumeUSD
       tvlUSD
     }
   }
 `
+
 
 interface ChartResults {
   uniswapDayDatas: {

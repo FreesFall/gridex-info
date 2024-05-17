@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { splitQuery } from 'utils/queries'
 import { START_BLOCKS } from 'constants/index'
 import { useActiveNetworkVersion, useBlockNumber, useClients } from 'state/application/hooks'
@@ -43,7 +43,23 @@ export function useBlocksFromTimestamps(
 
   // derive blocks based on active network
   const networkBlocks = blocks?.[activeNetwork.id]
-  // const blockNumber= useBlockNumber();
+  
+  const getLastBlock=async ()=>{
+          const res=await fetch(`https://subgraphs.benswap.cash/subgraphs/name/bentokenfinance/bch-blocks`, {
+              method: 'post',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(
+                  {
+                      "query":
+                      "\n{\n  blocks(orderBy:number,first:1,orderDirection:desc) {\n    number\n  }\n}",
+                      "variables": null, "operationName": null
+                  })
+          }
+          )
+          const data = await res.json();
+          return data.data.blocks[0].number;
+  }
+  const lastBlock=useRef<any>(null);
   useEffect(() => {
     // 计算给定日期的8点对应的区块号
     const calculateBlockNumberFor8AM=(daysAgo:any, currentBlockNumber:any, currentDate:any)=>{
@@ -69,44 +85,57 @@ export function useBlocksFromTimestamps(
       const res=timestamps.map((t,index)=>{
         const diffSeconds = currentTimestamp - t;
         const diffDays = diffSeconds / (60 * 60 * 24); // 将秒转换为天
-        console.log(`${index}: ${diffDays} days ago`);
+        // console.log(`${index}: ${diffDays} days ago`);
         return Math.floor(diffDays);
       })
-      console.log("结果",res)
-   
       for(const p of res){
         const blockNumberForDay = calculateBlockNumberFor8AM(p, currentBlockNumber, currentDate);
         blockNumbers.push(blockNumberForDay);
       }
-      console.log(blockNumbers)
+      // console.log(blockNumbers)
       return blockNumbers;
     }
 
 
     async function fetchData() {
-      calculateBlockNumbersForLast10Days8AM(timestamps, "55555555")
+      let retlastBlock:any=null;
+      if(!(lastBlock as any).current){
+        const lastBlockNumber=await getLastBlock();
+        retlastBlock=lastBlockNumber;
+        (lastBlock as any).current=lastBlockNumber;
+      }
+      console.log("lastBlockNumber",lastBlock.current)
+      const blocks=calculateBlockNumbersForLast10Days8AM(timestamps, lastBlock.current)
       const results:any={
         "data": {
-            "t1715744820": [
-                {
-                    "number": "19872834",
-                    "__typename": "Block"
-                }
-            ],
-            "t1715658420": [
-                {
-                    "number": "19865711",
-                    "__typename": "Block"
-                }
-            ],
-            "t1715226420": [
-                {
-                    "number": "19829947",
-                    "__typename": "Block"
-                }
-            ]
+            // "t1715744820": [
+            //     {
+            //         "number": "19872834",
+            //         "__typename": "Block"
+            //     }
+            // ],
+            // "t1715658420": [
+            //     {
+            //         "number": "19865711",
+            //         "__typename": "Block"
+            //     }
+            // ],
+            // "t1715226420": [
+            //     {
+            //         "number": "19829947",
+            //         "__typename": "Block"
+            //     }
+            // ]
         }
       }
+      for(const p of blocks){
+         results.data[`t${p.date/1000}`]={
+          "number":`${p.block}`,
+          "__typename": "Block"
+         };
+      }
+      console.log("results",results);
+   
       // TO DO
       // const results = await splitQuery(GET_BLOCKS, activeBlockClient, [], timestamps)
       if (results) {
